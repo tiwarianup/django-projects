@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    <h1>This is create Notice page.</h1>
+    <form method="POST"> {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">POST NOTICE</button>
+    </form>
+
+    {% if form.cleaned_data %}
+        <h1>Form data passed to backend.</h1>
+    {% endif %}
+{% endblock %}

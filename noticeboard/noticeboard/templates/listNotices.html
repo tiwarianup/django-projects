@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    {% for notice in objects %}
+        <li>{{ notice.noticeTitle }}</li>
+    {% endfor %}
+{% endblock %}
