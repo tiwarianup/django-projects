@@ -1,0 +1,31 @@
+<div class="col-12 col-md-4 mb-3 mt-3">
+    <div class="card bg-light text-info">
+        <div class="card-body">
+            <h4 class="card-title">{{ notice.noticeTitle }}</h4>
+            {% if details %}
+                <h1>{{ notice.noticeType }}</h1>
+                {% if notice.noticeImage %}
+                    <img src="{{ notice.noticeImage.url }}" class="rounded img-thumbnail" />
+                {% endif %}
+            {% endif %}
+            
+            <p class="card-text">
+                {% if truncate %}
+                    {{ notice.noticeBody | linebreaks | truncatewords:5}}
+                {% else %}
+                    {{ notice.noticeBody | linebreaks }}
+                {% endif %}
+            </p>
+            {% if not details %}
+            <p class="card-text">By {{ notice.noticeUser }}</p>
+                {% if not notice.publishDate %} 
+                    <i>Saved as Draft</i> 
+                {% else %}
+                    <small class="text-muted">{{ notice.publishDate }}</small>
+                {% endif %}<br>
+                <a href="{{ notice.postUrl }}" >View Notice</a>
+                
+            {% endif %}
+        </div>
+    </div>
+</div>

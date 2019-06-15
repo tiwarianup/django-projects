@@ -1,7 +1,17 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    {% for notice in objects %}
-        <li>{{ notice.noticeTitle }}</li>
-    {% endfor %}
+        <br>
+        {% if customTitle %}
+            <h1 align="center">Showing most recent notices posted by you.</h1>
+        {% else %}
+            <h1 align="center">Showing most recent Notices.</h1>
+        {% endif %}
+
+        <hr>
+        <div class="row">
+            {% for notice in objects %}
+                {% include "notice-list-inline.html" with notice=notice truncate=True details=False %}
+            {% endfor %}
+        </div>
 {% endblock %}

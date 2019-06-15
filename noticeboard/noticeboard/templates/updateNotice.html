@@ -1,7 +1,18 @@
 {% extends "layout.html" %}
 
 {% block content %}
+    <div class="row">
+        <br>
+        <div class="col-md-10 mx-auto bg-light text-success">
+            <h1>{{title}}</h1><hr>
+            <form method="POST"> {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-info"><strong>UPDATE NOTICE</strong></button>
+            </form>
 
-    <h1>This is update Notice page.</h1>
-
+            {% if form.cleaned_data %}
+                <h1>Notice updated in Database.</h1>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

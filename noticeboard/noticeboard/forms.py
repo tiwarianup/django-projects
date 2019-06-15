@@ -10,7 +10,7 @@ class createNoticeForm(forms.Form):
 class createNoticeModelForm(forms.ModelForm):
     class Meta:
         model = notice
-        fields = ['noticeTitle', 'noticeSlug', 'noticeType', 'noticeBody']
+        fields = ['noticeTitle', 'noticeSlug', 'noticeType', 'noticeBody', 'publishDate', 'noticeImage']
 
     def clean_noticeType(self, *args, **kwargs):
         allowedTypes = ["LOST", "FOUND", "BUY", "SELL"]

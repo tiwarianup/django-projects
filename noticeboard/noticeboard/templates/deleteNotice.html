@@ -1,7 +1,12 @@
 {% extends "layout.html" %}
 
 {% block content %}
-
-    <h1>This is delete Notice page.</h1>
-
+    <br>
+    <h4>Are you sure you want to delete the following notice?</h4><hr>
+    <h1>{{ object.noticeTitle }}</h1>
+    <hr>
+    <form method="POST">
+        {% csrf_token %}
+        <button class="btn btn-danger">Delete Notice</button>
+    </form>
 {% endblock %}

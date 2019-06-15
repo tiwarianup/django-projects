@@ -1,14 +1,18 @@
 {% extends "layout.html" %}
 
 {% block content %}
-
-    <h1>This is create Notice page.</h1>
-    <form method="POST"> {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">POST NOTICE</button>
-    </form>
-
-    {% if form.cleaned_data %}
-        <h1>Form data passed to backend.</h1>
-    {% endif %}
+    <div class="row">
+        <div class="col-md-10 mx-auto bg-light text-success">
+                <br>
+            <h3>Create a New Notice.</h3><hr>
+            <form method="POST" enctype="multipart/form-data"> {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary"><strong>POST NOTICE</strong></button>
+            </form>
+        
+            {% if form.cleaned_data %}
+                <h1>Notice Posted Successfully!</h1>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
