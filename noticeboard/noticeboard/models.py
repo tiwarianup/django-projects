@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django.db.models import Q
 
 # Create your models here.
 
@@ -12,6 +13,16 @@ class noticeQuerySet(models.QuerySet):
         now = timezone.now()
         return self.filter(publishDate__lte=now) 
 
+    def searchResults(self, query):
+        lookup = (
+                Q(noticeTitle__icontains=query ) | 
+                Q(noticeSlug__icontains=query ) | 
+                Q(noticeType__icontains=query ) | 
+                Q(noticeBody__icontains=query ) | 
+                Q(noticeUser__username__icontains=query )
+            )
+        return self.filter(lookup)
+
 class noticeManager(models.Manager):
 
     def get_queryset(self):
@@ -20,6 +31,10 @@ class noticeManager(models.Manager):
     def published(self):
         return self.get_queryset().published()
 
+    def searchNotice(self, query=None):
+        if query is None:
+            return self.get_queryset().none()
+        return self.get_queryset().searchResults(query)
         #return self.get_queryset().filter(publishDate__lte=now) # Here get_queryset() results in notice.objects
 
 class notice(models.Model):

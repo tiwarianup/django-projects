@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 col-md-10 mx-auto" align="center">
+        <hr>
+        {% if query %}
+            <h1 class="lead">You searched for {{ query }}</h1>
+            <hr>
+            {% for notice in foundNotices %}
+                {% include "notice-list-inline.html" with notice=notice truncate=True details=False %}
+            {% endfor %}
+        {% else %}
+            <h1>Search for notices.. Enter keywords below!</h1><hr>
+            <form class="form-inline my-2 my-lg-0 col-md-10" action="/notice-search/">
+                <input class="form-control mr-sm-2 col-md-10" type="search" placeholder="Browser for notices here..." name="q" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

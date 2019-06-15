@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'noticeboard',
+    'searchboard',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +56,7 @@ ROOT_URLCONF = 'djangoprojs.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "noticeboard", "templates")],
+        'DIRS': [os.path.join(BASE_DIR, "noticeboard", "templates"), os.path.join(BASE_DIR, "searchboard", "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

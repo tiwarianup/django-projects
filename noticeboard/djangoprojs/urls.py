@@ -17,13 +17,16 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import (path, include)
 from noticeboard.views import (listNotices, createNotice, homepage)
+from searchboard.views import searchPage
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', homepage),
     path('notices/', listNotices),
     path('new-notice/', createNotice),
-    path('notice/', include('noticeboard.urls'))
+    path('notice/', include('noticeboard.urls')),
+    path('notice-search/', searchPage)
+
 ]
 
 if settings.DEBUG:
