@@ -1,5 +1,5 @@
-# django URL Shortner app
-### This app leverages Django 1.10.2
+# URL Shortner app made with Python-Django
+### This app leverages Django v1.10.2
 
 ## This app has features that allows the users of application to shorten any URL on the web.
 
