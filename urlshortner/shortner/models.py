@@ -1,7 +1,7 @@
 from django.db import models
+from .validators import validate_anup, validate_inputUrl
 
 from .utils import shortcodeGenerator, createShortCode
-# Create your models here.
 
 class ShortUrlManager(models.Manager):
     def all(self, *args, **kwargs):
@@ -22,7 +22,7 @@ class ShortUrlManager(models.Manager):
 
 
 class ShortUrl(models.Model):
-    inputUrl        = models.CharField(max_length=220)
+    inputUrl        = models.CharField(max_length=220, validators=[validate_anup, validate_inputUrl])
     urlShortCode    = models.CharField(max_length=15, unique=True, blank=True)
     updateTime      = models.DateTimeField(auto_now=True)
     timestamp       = models.DateTimeField(auto_now_add=True)

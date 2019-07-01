@@ -1,0 +1,11 @@
+
+<div align="center">
+    <h1>{{ title}}</h1><hr>
+    <form method="POST" action="." > {% csrf_token %}
+        {{ form }}
+        <button type="submit">Shorten URL</button>
+    </form>
+    {% if toShort is not None %}
+        <hr><h2>You chose to short the URL: <a href="{{toShort}}" target="_blank"><br>{{ toShort }}</a></h2>
+    {% endif %}
+</div>

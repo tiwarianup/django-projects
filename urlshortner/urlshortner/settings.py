@@ -25,7 +25,7 @@ SECRET_KEY = 'x67x)cw+xl6mf%0euuc)eieng+sm5!%ao$u2x-d$6qf+bcx386'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['www.anupshorturl.com', 'anupshorturl.com']
 
 
 # Application definition
@@ -37,10 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_hosts',
     'shortner',
 ]
 
 MIDDLEWARE = [
+    'django_hosts.middleware.HostsRequestMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -48,14 +50,19 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_hosts.middleware.HostsResponseMiddleware',
 ]
 
 ROOT_URLCONF = 'urlshortner.urls'
+ROOT_HOSTCONF = 'urlshortner.hosts'
+DEFAULT_HOST = 'www'
+
+DEFAULT_REDIRECT_URL = 'http://www.anupshorturl.com:8000'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, "shortner", "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
