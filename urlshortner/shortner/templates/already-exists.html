@@ -1,0 +1,14 @@
+
+<div align="center">
+        <h1>{{ title }}</h1><hr>
+        {% if toShort is not None %}
+            <h2>You chose to short the URL: 
+                <a href="{{toShort}}" target="_blank">
+                    {{ toShort }}
+                </a>
+            </h2><hr>
+        {% endif %}
+        <h3>This URL already exists with Short Code = {{ objects.urlShortCode }}</h3>
+        <h2>Your ShortLink is: <a href="/{{ objects.urlShortCode }}">{{ siteUrl }}/{{ objects.urlShortCode }}</a></h2>
+        <h4><a href="/">Try another Link</a></h4>
+    </div>

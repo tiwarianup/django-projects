@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.views import View
+from django.conf import settings
+
 
 from .models import ShortUrl
 from .forms import SubmitUrlForm
@@ -25,14 +27,23 @@ class HomeView(View):
         template = "home.html"
 
         if form.is_valid():
+            submittedUrl = form.cleaned_data.get('inputUrl')
+            obj, created = ShortUrl.objects.get_or_create(inputUrl=submittedUrl)
 
-            context["toShort"] = form.cleaned_data.get("inputUrl")
-            inputUrl = form.cleaned_data.get('inputUrl')
-            obj, created = ShortUrl.objects.get_or_create(inputUrl=inputUrl)
+            DEFAULT_URL = getattr(settings, 'DEFAULT_REDIRECT_URL', 'http://www.a.su')
+            SITE_URL = DEFAULT_URL.split(".")[1:]
+            print(SITE_URL)
+            SITE_URL = "".join(SITE_URL)
+
+            context = {
+                "title": "SHORTEN URLs EASILY",
+                "toShort" : submittedUrl,
+                "objects" : obj,
+                "created" : created,
+                "siteUrl" : SITE_URL
+            }
 
             if created:
-                context['object'] = obj
-                context['created'] = created
                 template = "success.html"
             else:
                 template = "already-exists.html"

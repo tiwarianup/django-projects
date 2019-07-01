@@ -21,5 +21,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', HomeView.as_view()),
     url(r'^fb/(?P<urlShortCode>[\w-]+)/$', redirectView),
-    url(r'^cb/(?P<urlShortCode>[\w-]+)/$', RedirectCBView.as_view()),
+    url(r'^(?P<urlShortCode>[\w-]+)/$', RedirectCBView.as_view()),
 ]

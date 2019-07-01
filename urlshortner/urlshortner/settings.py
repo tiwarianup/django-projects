@@ -57,7 +57,7 @@ ROOT_URLCONF = 'urlshortner.urls'
 ROOT_HOSTCONF = 'urlshortner.hosts'
 DEFAULT_HOST = 'www'
 
-DEFAULT_REDIRECT_URL = 'http://www.anupshorturl.com:8000'
+DEFAULT_REDIRECT_URL = 'http://www.a.su:8000'
 
 TEMPLATES = [
     {

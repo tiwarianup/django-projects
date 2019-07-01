@@ -8,5 +8,7 @@
             </a>
         </h2><hr>
     {% endif %}
-    <h3>{{ object.inputUrl }}</h3>|<h3>{{ object.urlShortCode }}</h3>
+    <h3>Generated Short Code: {{ objects.urlShortCode }}</h3>
+    <h2>Your ShortLink is: <a href="/{{ objects.urlShortCode }}" target="_blank">{{ siteUrl }}/{{ objects.urlShortCode }}</a></h2>
+    <h4><a href="/">Try another Link</a></h4>
 </div>
