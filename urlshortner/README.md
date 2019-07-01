@@ -11,3 +11,8 @@
 2. python manage.py migrate 
 3. python manage.py runserver
 - Go to https://127.0.0.1:8000/ to access the application.
+
+### Requirements:
+- Python 3
+- Django 1.10.2
+- django-hosts v2
