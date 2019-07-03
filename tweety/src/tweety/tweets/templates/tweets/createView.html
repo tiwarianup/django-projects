@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 
+{% block title %} Create New Tweet | {{ block.super }} {% endblock title %}
+
 {% block content %}
-    {% include "tweets/tweetform.html" with form=form btnTitle='Tweet' %}
+    <div class='row'>
+        <h1>Create Tweet</h1>
+        {% include "tweets/tweetform.html" with form=form btnTitle='Tweet' %}
+    </div>
 {% endblock content %}

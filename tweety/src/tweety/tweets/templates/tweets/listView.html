@@ -1,19 +1,48 @@
 {% extends 'base.html' %}
 
-{% block content %}
-    {% include "tweets/tweetSearchForm.html" %}
-    <hr>
-    {% for object in object_list  %}
+{% block title %} View Tweets | {{ block.super }} {% endblock title %}
 
-        <h4>{{ object.tweetText }}</h4>
-        <strong>By: </strong> {{ object.author }}
-        <strong>Posted: </strong>{{ object.timestamp|timesince }} ago<hr>
-    {% empty %}
-        {% if request.GET.q %}
-            <h1>No Tweets found!</h1>
-        {% else %}
-            <h1>No Tweets posted yet!</h1>
+{% block content %}
+    <div class="row">
+        {% if not request.GET.q %}
+            <div class="col-sm-3 col-xs-12">
+                <h1>{{ request.user }}</h1>
+            </div>
         {% endif %}
-    {% endfor %}
+        <div class="col-sm-9 col-xs-12">
+            {% if not request.GET.q %}
+                <div>
+                    {% include 'tweets/tweetForm.html' with form=create_form action_url=create_url btnTitle='Post Tweet'%}
+                </div>
+            {% endif %}<hr>
+            {% for object in object_list  %}
+                <h4>{{ object.tweetText }}</h4>
+                <strong>Posted: </strong>{{ object.timestamp|timesince }} ago | 
+                <a href="{{ object.get_absolute_url }}" >View Tweet</a><hr>
+        
+
+    {% comment %}  <div class="media">
+        <div class="media-left">
+            <a href="#">
+                {% if object.image %}
+                    <img class="media-object" src="..." alt="...">
+                {% endif %}
+            </a>
+        </div>
+        <div class="media-body">
+            {{ object.tweetText }} <br>
+            via {{ object.author }} | {{ object.timestamp|timesince }} ago | <a href="{{ object.get_absolute_url }}">View Tweet</a>
+        </div>
+    </div><hr> {% endcomment %}
+        {% empty %}
+            {% if request.GET.q %}
+                <h1>No Tweets found!</h1>
+            {% else %}
+                <h1>No Tweets posted yet!</h1>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
 {% endblock content %}
 

@@ -1,4 +1,6 @@
-<form method="GET" action='{% url "tweet:tweetListView" %}'>
-    <input type="text" name="q" placeholder="Type here to seach tweets" value="{{ request.GET.q }}" />
-    <button>Search</button>
+<form class="navbar-form navbar-left" method="GET" action='{% url "tweet:tweetListView" %}'>
+    <div class="form-group">
+        <input class="form-control" type="text" name="q" placeholder="Type here to seach tweets" value="{{ request.GET.q }}" />
+    </div>
+    <button class="btn btn-default">Search</button>
 </form>
