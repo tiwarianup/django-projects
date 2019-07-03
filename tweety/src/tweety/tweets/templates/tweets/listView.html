@@ -1,7 +1,14 @@
+{% include "tweets/tweetSearchForm.html" %}
+<hr>
 {% for object in object_list  %}
 
     <h4>{{ object.tweetText }}</h4>
     <strong>By: </strong> {{ object.author }}
     <strong>Posted: </strong>{{ object.timestamp|timesince }} ago<hr>
-
+{% empty %}
+    {% if request.GET.q %}
+        <h1>No Tweets found!</h1>
+    {% else %}
+        <h1>No Tweets posted yet!</h1>
+    {% endif %}
 {% endfor %}

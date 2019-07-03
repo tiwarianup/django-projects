@@ -1,0 +1,4 @@
+<form method="GET" action='{% url "tweet:tweetListView" %}'>
+    <input type="text" name="q" placeholder="Type here to seach tweets" value="{{ request.GET.q }}" />
+    <button>Search</button>
+</form>
