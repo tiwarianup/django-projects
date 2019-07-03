@@ -1,5 +1,5 @@
 # Tweety a Twitter Like app made with Python-Django
-### This app leverages Django v1.10.2
+### This app leverages Django version 1.10.2
 
 ## This app has features that allows the users of application to tweet, like, retweet, comment, follow/unfollow users, generate hastags etc.
 
