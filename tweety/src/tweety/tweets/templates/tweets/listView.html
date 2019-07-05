@@ -1,8 +1,143 @@
 {% extends 'base.html' %}
 
+{% block script %}
+<script>
+
+function getParameterByName(name, url){
+    if(!url){
+        url = window.location.href;
+    }
+
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+$(document).ready(function(){
+    //console.log("Working");
+
+    var query = getParameterByName('q');
+    var tweetList = [];
+
+    function attachTweet(tweetValue, prepend){
+        var dateDisplay = tweetValue.date_display;
+        var timeSince = tweetValue.timesince;
+        var tweetAuthor = tweetValue.author;
+        var tweetText = tweetValue.tweetText;
+        var tweetFormattedHTML = "<div class='media'><div class='media-body'>"+tweetText+"<br>via "+tweetAuthor.username + " | " + dateDisplay + " | " + "<a href='#'>View Tweet</a>"+ "</div></div><hr>";
+        if(prepend == true){
+            $("#tweet-container").prepend(tweetFormattedHTML);
+        }else{
+            $("#tweet-container").append(tweetFormattedHTML);
+        }
+    }
+
+    function parseTweets(){
+        if ( tweetList == 0){
+            $("#tweet-container").text("No tweets found!");
+        }else{
+            $.each(tweetList, function(key, value){
+                var tweetkey = key;
+                attachTweet(value);
+            })
+        }
+    }
+
+    function fetchTweets(){
+        $.ajax({
+            //url: '{% url "tweet-api:list" %}',
+            url: '{% url "tweet-api:list" %}',
+            data: {
+                'q':query
+            },
+            method: 'GET',
+            success: function(data){
+                // console.log(data)
+                //fetchTweets();
+                tweetList = data;
+                parseTweets();
+            },
+            error: function(data){
+                console.log('error');
+                //console.log(data)
+            }
+        })
+    }
+
+    fetchTweets();
+
+    var charStart = 140;
+    var charsCurrent = 0;
+
+    $("#tweet-form").append("<span id='tweetCharsLeft'> " +  charStart + " characters left. </span>");
+
+    $("#tweet-form textarea").keyup(function(event){
+        //console.log(event.key, event.timeStamp);
+        var tweetValue = $(this).val();
+        charsCurrent  = charStart - tweetValue.length;
+        var spanChars = $("#tweetCharsLeft");
+
+        spanChars.text(charsCurrent + " characters left.");
+
+        if(charsCurrent > 0){
+            spanChars.removeClass("grey-color");
+            spanChars.removeClass("red-color");
+        }else if (charsCurrent == 0){
+            spanChars.removeClass("red-color");
+            spanChars.addClass('grey-color');
+        }else if (charsCurrent < 0){
+            spanChars.removeClass("grey-color");
+            spanChars.addClass('red-color');
+        }
+    })
+
+
+    $("#tweet-form").submit(function(event){
+        event.preventDefault();
+
+        var this_ = $(this);
+        //console.log(event);
+        var formData = this_.serialize();
+        //console.log(this_.serialize());
+
+        if (charsCurrent >= 0){
+            $.ajax({
+                //url: '{% url "tweet-api:list" %}',
+                url: '/api/tweet/create/',
+                data: formData,
+                method: 'POST',
+                success: function(data){
+                    console.log(data);
+                    this_.find("input[type=text], textarea").val("");
+                    attachTweet(data, true);
+                    //fetchTweets();
+                },
+                error: function(data){
+                    console.log('error');
+                    console.log(data.status);
+                }
+            })
+        }else{
+            console.log("Cannot send tweet to database. Too long.");
+        }
+
+        
+        fetchTweets();
+    })
+
+});
+
+</script>
+{% endblock script %}
+
 {% block title %} View Tweets | {{ block.super }} {% endblock title %}
 
 {% block content %}
+
+    
     <div class="row">
         {% if not request.GET.q %}
             <div class="col-sm-3 col-xs-12">
@@ -12,14 +147,25 @@
         <div class="col-sm-9 col-xs-12">
             {% if not request.GET.q %}
                 <div>
-                    {% include 'tweets/tweetForm.html' with form=create_form action_url=create_url btnTitle='Post Tweet'%}
+                    {% include 'tweets/tweetForm.html' with form=create_form action_url=create_url btnTitle='Post Tweet' formId='tweet-form'%}
                 </div>
             {% endif %}<hr>
-            {% for object in object_list  %}
-                <h4>{{ object.tweetText }}</h4>
+
+            <div id='tweet-container'>
+
+            </div>
+
+            
+    </div>
+</div>
+
+{% endblock content %}
+
+{% for object in object_list  %}
+             {% comment %}    <h4>{{ object.tweetText }}</h4>
                 <strong>Posted: </strong>{{ object.timestamp|timesince }} ago | 
                 <a href="{{ object.get_absolute_url }}" >View Tweet</a><hr>
-        
+         {% endcomment %}
 
     {% comment %}  <div class="media">
         <div class="media-left">
@@ -41,8 +187,3 @@
                 <h1>No Tweets posted yet!</h1>
             {% endif %}
         {% endfor %}
-    </div>
-</div>
-
-{% endblock content %}
-
