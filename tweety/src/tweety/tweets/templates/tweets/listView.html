@@ -21,13 +21,15 @@ $(document).ready(function(){
 
     var query = getParameterByName('q');
     var tweetList = [];
+    var nextTweetUrl;
 
     function attachTweet(tweetValue, prepend){
         var dateDisplay = tweetValue.date_display;
         var timeSince = tweetValue.timesince;
         var tweetAuthor = tweetValue.author;
         var tweetText = tweetValue.tweetText;
-        var tweetFormattedHTML = "<div class='media'><div class='media-body'>"+tweetText+"<br>via "+tweetAuthor.username + " | " + dateDisplay + " | " + "<a href='#'>View Tweet</a>"+ "</div></div><hr>";
+        var tweetUrl = tweetValue.tweetUrl;
+        var tweetFormattedHTML = "<div class='media'><div class='media-body'>"+tweetText+"<br>via "+tweetAuthor.username + " | " + dateDisplay + " | " + "<a href='" + tweetUrl + "'>View Tweet</a>"+ "</div></div><hr>";
         if(prepend == true){
             $("#tweet-container").prepend(tweetFormattedHTML);
         }else{
@@ -46,10 +48,18 @@ $(document).ready(function(){
         }
     }
 
-    function fetchTweets(){
+    function fetchTweets(url){
+
+        var fetchUrl;
+        if(!url){
+            fetchUrl = '{% url "tweet-api:list" %}'
+        }else{
+            fetchUrl = url
+        }
+
         $.ajax({
             //url: '{% url "tweet-api:list" %}',
-            url: '{% url "tweet-api:list" %}',
+            url: fetchUrl,
             data: {
                 'q':query
             },
@@ -57,7 +67,15 @@ $(document).ready(function(){
             success: function(data){
                 // console.log(data)
                 //fetchTweets();
-                tweetList = data;
+                tweetList = data.results;
+
+                if(data.next){
+                    nextTweetUrl = data.next;
+                }else{
+                    $("#loadmore").css("display", "none");
+                    $("#loadmoretext").text("No more Tweets to display.");
+                }
+
                 parseTweets();
             },
             error: function(data){
@@ -68,6 +86,13 @@ $(document).ready(function(){
     }
 
     fetchTweets();
+
+    $("#loadmore").click(function(event){
+        event.preventDefault();
+        if(nextTweetUrl){
+            fetchTweets(nextTweetUrl);
+        }
+    })
 
     var charStart = 140;
     var charsCurrent = 0;
@@ -140,7 +165,7 @@ $(document).ready(function(){
     
     <div class="row">
         {% if not request.GET.q %}
-            <div class="col-sm-3 col-xs-12">
+            <div class="col-sm-3 col-xs-12  red-color">
                 <h1>{{ request.user }}</h1>
             </div>
         {% endif %}
@@ -154,7 +179,11 @@ $(document).ready(function(){
             <div id='tweet-container'>
 
             </div>
-
+            <strong><div id="loadmoretext">
+                <a href='#' id='loadmore'>Load More Tweets</a>
+                <br>
+            </div></strong>
+            <hr>
             
     </div>
 </div>

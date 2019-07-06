@@ -7,14 +7,18 @@ class TweetModelSerializer(serializers.ModelSerializer):
     author = UserDisplaySerializer(read_only=True)
     date_display = serializers.SerializerMethodField()
     timesince = serializers.SerializerMethodField()
+    tweetUrl = serializers.SerializerMethodField()
     
     class Meta:
         model = Tweet
-        fields = [ "author", "tweetText", "timestamp", "date_display", "timesince"]
+        fields = [ "author", "tweetText", "timestamp", "date_display", "timesince", 'tweetUrl']
 
     def get_date_display(self, obj):
         return obj.timestamp.strftime("%B %d %Y, %I:%M %p")
 
     def get_timesince(self, obj):
         return timesince(obj.timestamp) + " ago"
+    
+    def get_tweetUrl(self, obj):
+        return obj.get_absolute_url()
     
