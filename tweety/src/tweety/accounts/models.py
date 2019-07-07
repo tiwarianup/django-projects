@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.urls import reverse_lazy
+from django.db.models.signals import post_save
 # Create your models here.
 
 class UserProfileManager(models.Manager):
@@ -14,6 +16,24 @@ class UserProfileManager(models.Manager):
             pass
         return qs
 
+    def toggleFollow(self, user, toToggleUser):
+        userProfile, created = UserProfile.objects.get_or_create(user=user)
+        if toToggleUser in userProfile.following.all():
+            userProfile.following.remove(toToggleUser)
+            added = False
+        else:
+            userProfile.following.add(toToggleUser)
+            added = True
+        return added
+
+    def isFollwoing(self, user, followedByUser):
+        userProfile, created = UserProfile.objects.get_or_create(user=user)
+        if created:
+            return False
+        if followedByUser in userProfile.following.all():
+            return True
+        return False
+
 class UserProfile(models.Model):
     user       = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='profile')
     following  = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='followed_by')
@@ -24,7 +44,21 @@ class UserProfile(models.Model):
     objects = UserProfileManager()
 
     def __str__(self):
-        return str(self.following.all().count())
+        return str(self.user.username)
 
     def get_following(self):
         return self.following.all().exclude(username=self.user.username)
+
+    def get_follow_url(self):
+        return reverse_lazy("profiles:follow", kwargs={"username":self.user.username})
+
+    def get_absolute_url(self):
+        return reverse_lazy("profiles:detail",kwargs={"username":self.user.username})
+    
+
+def post_save_user_receiver(sender, instance, created, *args, **kwargs):
+    print(instance)
+    if created:
+        new_profile = UserProfile.objects.get_or_create(user=instance)
+
+post_save.connect(post_save_user_receiver, sender=settings.AUTH_USER_MODEL)

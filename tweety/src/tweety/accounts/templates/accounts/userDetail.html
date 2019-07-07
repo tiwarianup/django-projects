@@ -5,9 +5,15 @@
 {% block content %}
 <div class="row">
     <div class="col-sm-3 col-xs-12">
-        <h1 class="red-color"> {{ object.username }} </h1>
+        <h2 class="violet-color"><strong> {{ object.username }} </strong></h2>
+
         {% comment %} <p>{{ object.followed_by.all.count }} Followers | {{ object.profile.get_following.count }} Following </p>  {% endcomment %}
+
+        <p><a class="btn btn-link" href='{{ object.profile.get_follow_url }}'>
+            {% if following %} Unfollow {% else %} Follow {% endif %}
+        </a></p>
         <hr>
+
         <h3>Followers <small>{{ object.followed_by.all.count }}</small></h3>
         {% for profile in object.followed_by.all %}
             <a href='/{{ profile.user.username }}'> {{ profile.user.username }} </a> <br>
