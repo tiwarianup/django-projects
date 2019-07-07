@@ -4,7 +4,7 @@ from .views import UserDetailView
 
 
 urlpatterns = [
-    url(r'^(?P<pk>\d+)/$', UserDetailView.as_view(), name='list'),
+    url(r'^(?P<username>[\w.@+-]+)/$', UserDetailView.as_view(), name='details'),
     
     # $ means the end of the string
 ]

@@ -4,14 +4,31 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-sm-3 col-xs-12 red-color">
-        <h1> {{ object.username }} </h1>
+    <div class="col-sm-3 col-xs-12">
+        <h1 class="red-color"> {{ object.username }} </h1>
+        {% comment %} <p>{{ object.followed_by.all.count }} Followers | {{ object.profile.get_following.count }} Following </p>  {% endcomment %}
+        <hr>
+        <h3>Followers <small>{{ object.followed_by.all.count }}</small></h3>
+        {% for profile in object.followed_by.all %}
+            <a href='/{{ profile.user.username }}'> {{ profile.user.username }} </a> <br>
+        {% empty %}
+            <h5>Not followed by any one currently.</h5>
+        {% endfor %}
+        <hr>
+        <h3>Following <small>{{ object.profile.get_following.count }}</small></h3>
+        {% for user in object.profile.get_following %}
+            <a href='/{{ user.username }}'> {{ user.username }} </a> <br>
+        {% empty %}
+            <h5>Not following any users currently.</h5>
+        {% endfor %}
+        
     </div>
     <div class="col-sm-9 col-xs-12">
         <h1>Tweets</h1>
         {% for tweet in object.tweet_set.all %}
             {{ tweet }}<hr>
         {% endfor %}
+        
     </div>
 </div>
 
