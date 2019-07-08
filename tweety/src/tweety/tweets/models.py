@@ -4,6 +4,17 @@ from django.urls import reverse
 
 from .validators import validateTweetText
 
+class TweetManager(models.Manager):
+    def retweet(self, user, parent_obj):
+        obj = self.model(
+            parentTweet = parent_obj,
+            author = user,
+            tweetText = parent_obj.tweetText
+        )
+        obj.save()
+        return obj
+
+
 class Tweet(models.Model):
     parentTweet = models.ForeignKey("self", blank=True, null=True)
     author      = models.ForeignKey(settings.AUTH_USER_MODEL)
