@@ -1,8 +1,11 @@
+import re
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
+from django.db.models.signals import post_save
 
+from hashtags.signals import parsed_hashtags
 from .validators import validateTweetText
 
 class TweetManager(models.Manager):
@@ -56,3 +59,22 @@ class Tweet(models.Model):
     #     if tweetText == "anup":
     #         raise ValidationError("The tweet cannot have my name!")
     #     return super(Tweet, self).clean(*args, **kwargs)
+
+def tweetSaveReceiver(sender, instance, created, *args, **kwargs):
+    if created and not instance.parentTweet:
+        # notify a user
+        userRegex = r'@(?P<username>[\w.@+-]+)'
+        usernames = re.findall(userRegex, instance.tweetText)
+        #print(usernames)
+        #send notification to user.
+
+        hashTagRegex = r'#(?P<hashtag>[\w\d-]+)'
+        hashtags = re.findall(hashTagRegex, instance.tweetText)
+        #print(hashtags)
+        #send hashtag signal to user.
+        parsed_hashtags.send(sender=instance.__class__, hashtag_list=hashtags)
+
+
+
+
+post_save.connect(tweetSaveReceiver, sender=Tweet)
