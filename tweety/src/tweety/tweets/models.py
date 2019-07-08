@@ -1,13 +1,30 @@
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
 
 from .validators import validateTweetText
 
 class TweetManager(models.Manager):
     def retweet(self, user, parent_obj):
+        if parent_obj.parentTweet:
+            ogParentTweet = parent_obj.parentTweet
+        else:
+            ogParentTweet = parent_obj 
+
+        qs = self.get_queryset().filter(
+                author=user, 
+                parentTweet=ogParentTweet
+            ).filter(
+                timestamp__year = timezone.now().year,
+                timestamp__month = timezone.now().month,
+                timestamp__day = timezone.now().day
+            )
+        if qs.exists():
+            return None
+
         obj = self.model(
-            parentTweet = parent_obj,
+            parentTweet = ogParentTweet,
             author = user,
             tweetText = parent_obj.tweetText
         )
@@ -24,6 +41,8 @@ class Tweet(models.Model):
 
     class Meta:
         ordering = ["-timestamp"]
+    
+    objects = TweetManager()
     
 
     def __str__(self):
