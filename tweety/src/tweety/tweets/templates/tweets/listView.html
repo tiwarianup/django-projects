@@ -23,6 +23,15 @@ $(document).ready(function(){
     var tweetList = [];
     var nextTweetUrl;
 
+    function updateHashLinks(){
+        $(".media-body").each(function(data){
+            var hashtagRegex = /(^|\s)#([\w\d-]+)/g ;
+            var newText = $(this).html().replace(hashtagRegex, "$1<a href='/tags/$2/'>#$2</a>");
+            $(this).html(newText);
+        })
+    }
+
+
     function attachTweet(tweetValue, prepend){
         var dateDisplay = tweetValue.date_display;
         var timeSince = tweetValue.timesince;
@@ -74,10 +83,11 @@ $(document).ready(function(){
                     nextTweetUrl = data.next;
                 }else{
                     $("#loadmore").css("display", "none");
-                    $("#loadmoretext").text("No more Tweets to display.");
+                    //$("#loadmoretext").text("No more Tweets to display.");
                 }
 
                 parseTweets();
+                updateHashLinks();
             },
             error: function(data){
                 console.log('error');
@@ -139,6 +149,7 @@ $(document).ready(function(){
                     console.log(data);
                     this_.find("input[type=text], textarea").val("");
                     attachTweet(data, true);
+                    updateHashLinks();
                     //fetchTweets();
                 },
                 error: function(data){
@@ -180,10 +191,9 @@ $(document).ready(function(){
             <div id='tweet-container'>
 
             </div>
-            <strong><div id="loadmoretext">
-                <a href='#' id='loadmore'>Load More Tweets</a>
-                <br>
-            </div></strong>
+          
+            <a href='#' id='loadmore'>Load More Tweets</a>
+            <br>
             <hr>
             
     </div>

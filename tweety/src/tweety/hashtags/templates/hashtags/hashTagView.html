@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %} View Tweets | {{ block.super }} {% endblock title %}
+
+{% block content %}
+
+<div class="row">
+    {% if not request.GET.q %}
+        <div class="col-sm-3 col-xs-12  red-color">
+            <h1>{{ object.hashTagText }}</h1>
+        </div>
+    {% endif %}
+    <div class="col-sm-9 col-xs-12">
+
+        {% for tweet in object.get_tweets %}
+            {{tweet.tweetText}}<hr>
+        {% endfor %}
+        
+    </div>
+</div>
+
+{% endblock content %}
