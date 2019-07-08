@@ -29,6 +29,19 @@
       .violet-color{
         color:#39298c;
       }
+
+      .navbar-inverse {
+        background-color: #286090;
+        border-color: #1f4f77;
+      }
+
+      .navbar-inverse .navbar-brand {
+        color: #f5f5f5;
+      }
+
+      .navbar-inverse .navbar-nav>li>a {
+        color: #f5f5f5;
+      }
     </style>
 
   </head>
@@ -88,12 +101,46 @@
           return decodeURIComponent(results[2].replace(/\+/g, " "));
       }
 
-      function loadTweetContainer(){
+      function loadTweetContainer(containerId){
           var query = getParameterByName('q');
           var tweetList = [];
           var nextTweetUrl;
-          var initialUrl = '{% url "tweet-api:list" %}';
-          var tweetContainer = $("#tweet-container");
+          var tweetContainer;
+
+          if(containerId){
+            tweetContainer = $(containerId);
+          }else{
+            tweetContainer = $("#tweet-container");
+          }
+          
+          var initialUrl = tweetContainer.attr("data-url") || '{% url "tweet-api:list" %}';
+          console.log(initialUrl);
+
+          $(document.body).on("click", ".tweet-like", function(event){
+            event.preventDefault();
+
+            var this_ = $(this);
+            var tweetId = this_.attr("data-id");
+            var likedUrl = '/api/tweet/' + tweetId + "/like/"
+            
+
+            $.ajax({
+              method: "GET",
+              url: likedUrl,
+              success: function(data){
+                if(data.liked){
+                  this_.text("Liked");
+                }else{
+                  this_.text("Like");
+                }
+              },
+              error: function(data){
+                console.log(data);
+                console.log("error");
+              }
+            })
+
+          })
 
           $(document.body).on("click", ".retweet", function(event){
               event.preventDefault();
@@ -105,8 +152,11 @@
                   success: function(data){
                       //console.log(data);
                       if (data.parentTweet ){
-                          attachTweet(data, true, true);
-                          updateHashLinks();
+                          // if username is in the path, ignore the following.
+                          if(initialUrl == '/api/tweet'){
+                              attachTweet(data, true, true);
+                              updateHashLinks();
+                          }
                       }else{
                           attachTweet(data);
                           updateHashLinks();
@@ -151,9 +201,9 @@
               if(retweet && tweetValue.parentTweet){
                   var mainTweet = tweetValue.parentTweet;
 
-                  tweetFormattedHTML = "<div class='media'><div class='media-body'><h5 class='violet-color'>Retweet via "+ tweetAuthor +" on "+ dateDisplay +"</h5>"+ mainTweet.tweetText +"<br>via <a href='" + mainTweet.author.profileUrl + "'>" + mainTweet.author.username + "</a> | " + mainTweet.date_display + " | " + "<a href='" + mainTweet.tweetUrl + "'>View Tweet</a>"+ "<a class='retweet'  href='/tweet/" + mainTweet.id + "/retweet/'>| Retweet</a>"+ "</div></div><hr>";
+                  tweetFormattedHTML = "<div class='media'><div class='media-body'><h5 class='violet-color'>Retweet via "+ tweetAuthor +" on "+ dateDisplay +"</h5>"+ mainTweet.tweetText +"<br>via <a href='" + mainTweet.author.profileUrl + "'>" + mainTweet.author.username + "</a> | " + mainTweet.date_display + " | " + "<a href='" + mainTweet.tweetUrl + "'>View</a>"+ " | <a class='retweet'  href='/tweet/" + mainTweet.id + "/retweet/'>Retweet</a> | <a href='#' class='tweet-like' data-id="+ mainTweet.id +">Like</a></div></div><hr>";
               }else{
-                  tweetFormattedHTML = "<div class='media'><div class='media-body'>"+tweetText+"<br>via <a href='" + profileUrl + "'>" + tweetAuthor + "</a> | " + dateDisplay + " | " + "<a href='" + tweetUrl + "'>View Tweet</a>" + "<a class='retweet' href='/tweet/" + tweetId + "/retweet/'>| Retweet</a>"+ "</div></div><hr>";
+                  tweetFormattedHTML = "<div class='media'><div class='media-body'>"+tweetText+"<br>via <a href='" + profileUrl + "'>" + tweetAuthor + "</a> | " + dateDisplay + " | " + "<a href='" + tweetUrl + "'>View</a>" + " | <a class='retweet' href='/tweet/" + tweetId + "/retweet/'>  Retweet</a> | <a href='#' class='tweet-like' data-id="+ tweetId +">Like</a></div></div><hr>";
               }
 
               

@@ -9,6 +9,17 @@ from tweets.models import Tweet
 from .pagination import StandardResultsPagination
 from .serializers import TweetModelSerializer
 
+class LikeTweetToggleApiView(APIView):
+    permission_classes = [ permissions.IsAuthenticated ]
+
+    def get(self, request, pk, format=None):
+        tweet_qs = Tweet.objects.filter(pk=pk)
+        message = "This function is not allowed."
+        if request.user.is_authenticated():
+            isLiked = Tweet.objects.likeTweetToggle(request.user, tweet_qs.first())
+            return Response({"liked": isLiked})
+        return Response({"message": message}, status=400)
+
 class RetweetApiView(APIView):
     permission_classes = [ permissions.IsAuthenticated ]
 
@@ -35,13 +46,16 @@ class TweetListApiView(generics.ListAPIView):
     serializer_class = TweetModelSerializer
     pagination_class = StandardResultsPagination
 
-    def get_queryset(self):
-        userFollowing = self.request.user.profile.get_following()
-        qs1 = Tweet.objects.filter(author__in=userFollowing).order_by("-timestamp")
-        qs2 = Tweet.objects.filter(author=self.request.user)
-        qs = (qs1 | qs2).distinct().order_by("-timestamp")
-        #qs = Tweet.objects.all().order_by("-timestamp")
-        #print(self.request.GET)
+    def get_queryset(self, *args, **kwargs):
+        requestedUser = self.kwargs.get("username")
+        if requestedUser:
+            qs = Tweet.objects.filter(author__username=requestedUser).order_by("-timestamp")
+        else:
+            userFollowing = self.request.user.profile.get_following()
+            qs1 = Tweet.objects.filter(author__in=userFollowing).order_by("-timestamp")
+            qs2 = Tweet.objects.filter(author=self.request.user)
+            qs = (qs1 | qs2).distinct().order_by("-timestamp")
+
         query = self.request.GET.get("q", None)
         if query is not None:
             qs = qs.filter(

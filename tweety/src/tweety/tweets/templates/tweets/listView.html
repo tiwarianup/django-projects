@@ -5,7 +5,7 @@
 
 $(document).ready(function(){
 
-    loadTweetContainer();
+    loadTweetContainer("#tweet-container");
 
 });
 
@@ -30,7 +30,7 @@ $(document).ready(function(){
                 </div>
             {% endif %}<hr>
 
-            <div id='tweet-container'>
+            <div id='tweet-container' data-url='/api/tweet/'>
 
             </div>
           
