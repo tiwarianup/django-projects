@@ -26,25 +26,40 @@ class RetweetApiView(APIView):
     def get(self, request, pk, format=None):
         tweet_qs = Tweet.objects.filter(pk=pk)
         message = "This function is not allowed."
-        if tweet_qs.exists() and tweet_qs.count() == 1:
-            if request.user.is_authenticated():
-                newTweet = Tweet.objects.retweet(request.user, tweet_qs.first())
-                if newTweet is not None:
-                    data = TweetModelSerializer(newTweet).data
-                    return Response(data)
-                message = "Cannot retweet the same tweet within 1 day."
+        try:
+            if tweet_qs.exists() and tweet_qs.count() == 1:
+                if request.user.is_authenticated():
+                    newTweet = Tweet.objects.retweet(request.user, tweet_qs.first())
+                    if newTweet is not None:
+                        data = TweetModelSerializer(newTweet).data
+                        #print(data)
+                        message = "Retweet Success!"
+                        return Response(data)
+        except Exception as e:
+            print(str(e))
+            message = "Unsuccessful."
+            
         return Response({"response": message}, status=400)
 
 class TweetCreateApiView(generics.CreateAPIView):
     serializer_class = TweetModelSerializer
     permission_classes = [ permissions.IsAuthenticated ]
 
+    print(dir(serializer_class))
+
     def perform_create(self, serializer):
+        #print(self.request.query_params)
         serializer.save(author=self.request.user)
 
 class TweetListApiView(generics.ListAPIView):
     serializer_class = TweetModelSerializer
     pagination_class = StandardResultsPagination
+
+    def get_serializer_context(self, *args, **kwargs):
+        context = super(TweetListApiView, self).get_serializer_context(*args, **kwargs)
+        context['user'] = self.request.user
+        #print(context)
+        return context
 
     def get_queryset(self, *args, **kwargs):
         requestedUser = self.kwargs.get("username")

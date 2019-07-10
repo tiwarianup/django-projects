@@ -1,5 +1,5 @@
 {% load crispy_forms_tags %}
-<form {% if formId %} id='{{ formId }}' {% endif %} class="form" method="POST" action="{% if action_url %}{{ action_url }}{% endif %}"> {% csrf_token %}
+<form class="form {% if formClass %} {{ formClass }} {% endif %}" method="POST" action="{% if action_url %}{{ action_url }}{% endif %}"> {% csrf_token %}
     {{ form|crispy }}
     <button class="btn btn-primary">{{ btnTitle }} </button>
 </form>

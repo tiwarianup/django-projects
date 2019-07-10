@@ -52,6 +52,7 @@
             Some Content
         {% endblock content %}
     </div>
+    {% include 'reply-modal.html' %}
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
@@ -129,7 +130,7 @@
               url: likedUrl,
               success: function(data){
                 if(data.liked){
-                  this_.text("Liked");
+                  this_.text("Unlike");
                 }else{
                   this_.text("Like");
                 }
@@ -141,6 +142,26 @@
             })
 
           })
+
+
+          $(document.body).on("click", ".tweet-reply", function(event){
+            event.preventDefault()
+
+            var this_ = $(this);
+            var parentId = this_.attr("data-id");
+            var username = this_.attr("data-user");
+
+            $("#replyModal").modal({});
+            $("#replyModal textarea").after("<input type='hidden' value='"+ parentId + "'  name='parent_id' />");
+            $("#replyModal textarea").after("<input type='hidden' value='"+ true + "'  name='isReply' />");
+            $("#replyModal textarea").val("@"+username+ " ");
+            $("#replyModal").on("shown.bs.modal", function(){
+              $('textarea#tweetReplyArea').focus();
+            })
+
+
+          });
+
 
           $(document.body).on("click", ".retweet", function(event){
               event.preventDefault();
@@ -184,28 +205,38 @@
               })
           }
 
+          function formatTweet(tweetValue){
+            
+
+            var preContent;
+            var isReply = tweetValue.isReply;
+            if(tweetValue.parentTweet && !isReply){
+              tweetValue = tweetValue.parentTweet;
+              preContent = "<h5 class='violet-color'>Retweet via "+ tweetValue.author.username +" on "+ tweetValue.date_display +"</h5>";
+            }else if(tweetValue.parentTweet && isReply){
+              preContent = "<h5 class='violet-color'>Reply to @"+ tweetValue.parentTweet.author.username + "</h5>";
+            }
+
+            var verb = 'Like';
+            if(tweetValue.didLike){
+              verb = 'Unlike';
+            }
+
+            var tweetContent;
+            tweetContent =  tweetValue.tweetText +"<br>via <a href='" + tweetValue.author.profileUrl + "'>" + tweetValue.author.username + "</a> | " + tweetValue.date_display + " | " + "<a href='" + tweetValue.tweetUrl + "'>View</a>" + " | <a class='retweet' href='/tweet/" + tweetValue.id + "/retweet/'>  Retweet</a> | <a href='#' class='tweet-like' data-id='"+ tweetValue.id +"'>"+ verb + " ("+ tweetValue.likes +")</a> | <a href='#' class='tweet-reply' data-user='"+ tweetValue.author.username +"' data-id='"+ tweetValue.id +"'>Reply</a>";
+
+            var container;
+            if(preContent){
+              container = "<div class='media'><div class='media-body'>" + preContent + tweetContent +"</div></div><hr>";
+            }else{
+              container = "<div class='media'><div class='media-body'>" + tweetContent +"</div></div><hr>";
+            }
+            
+            return container;
+          }
 
           function attachTweet(tweetValue, prepend, retweet){
-
-              var dateDisplay = tweetValue.date_display;
-              var timeSince = tweetValue.timesince;
-              var tweetAuthor = tweetValue.author.username;
-              var profileUrl = tweetValue.author.profileUrl;
-              var tweetText = tweetValue.tweetText;
-              var tweetUrl = tweetValue.tweetUrl;
-              var tweetId = tweetValue.id;
-              
-              //var isRetweet = tweetValue.isRetweet;
-
-              var tweetFormattedHTML;
-              if(retweet && tweetValue.parentTweet){
-                  var mainTweet = tweetValue.parentTweet;
-
-                  tweetFormattedHTML = "<div class='media'><div class='media-body'><h5 class='violet-color'>Retweet via "+ tweetAuthor +" on "+ dateDisplay +"</h5>"+ mainTweet.tweetText +"<br>via <a href='" + mainTweet.author.profileUrl + "'>" + mainTweet.author.username + "</a> | " + mainTweet.date_display + " | " + "<a href='" + mainTweet.tweetUrl + "'>View</a>"+ " | <a class='retweet'  href='/tweet/" + mainTweet.id + "/retweet/'>Retweet</a> | <a href='#' class='tweet-like' data-id="+ mainTweet.id +">Like</a></div></div><hr>";
-              }else{
-                  tweetFormattedHTML = "<div class='media'><div class='media-body'>"+tweetText+"<br>via <a href='" + profileUrl + "'>" + tweetAuthor + "</a> | " + dateDisplay + " | " + "<a href='" + tweetUrl + "'>View</a>" + " | <a class='retweet' href='/tweet/" + tweetId + "/retweet/'>  Retweet</a> | <a href='#' class='tweet-like' data-id="+ tweetId +">Like</a></div></div><hr>";
-              }
-
+              tweetFormattedHTML = formatTweet(tweetValue)
               
               if(prepend == true){
                   tweetContainer.prepend(tweetFormattedHTML);
@@ -280,13 +311,13 @@
           var charStart = 140;
           var charsCurrent = 0;
 
-          $("#tweet-form").append("<span id='tweetCharsLeft'> " +  charStart + " characters left. </span>");
+          $(".tweet-form").append("<span class='tweetCharsLeft'> " +  charStart + " characters left. </span>");
 
-          $("#tweet-form textarea").keyup(function(event){
+          $(".tweet-form textarea").keyup(function(event){
               //console.log(event.key, event.timeStamp);
               var tweetValue = $(this).val();
               charsCurrent  = charStart - tweetValue.length;
-              var spanChars = $("#tweetCharsLeft");
+              var spanChars = $(this).parent().parent().parent().find(".tweetCharsLeft");
 
               spanChars.text(charsCurrent + " characters left.");
 
@@ -303,13 +334,13 @@
           })
 
 
-          $("#tweet-form").submit(function(event){
+          $(".tweet-form").submit(function(event){
               event.preventDefault();
 
               var this_ = $(this);
               //console.log(event);
               var formData = this_.serialize();
-              //console.log(this_.serialize());
+              console.log(formData);
 
               if (charsCurrent >= 0){
                   $.ajax({
@@ -322,6 +353,7 @@
                           this_.find("input[type=text], textarea").val("");
                           attachTweet(data, true);
                           updateHashLinks();
+                          $("#replyModal").modal("hide");
                           //fetchTweets();
                       },
                       error: function(data){
@@ -345,3 +377,23 @@
     <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script> -->
   </body>
 </html>
+
+<!--
+  var dateDisplay = tweetValue.date_display;
+              var timeSince = tweetValue.timesince;
+              var tweetAuthor = tweetValue.author.username;
+              var profileUrl = tweetValue.author.profileUrl;
+              var tweetText = tweetValue.tweetText;
+              var tweetUrl = tweetValue.tweetUrl;
+              var tweetId = tweetValue.id;
+              
+              //var isRetweet = tweetValue.isRetweet;
+
+                if(retweet && tweetValue.parentTweet){
+                  var mainTweet = tweetValue.parentTweet;
+
+                  tweetFormattedHTML = "<div class='media'><div class='media-body'><h5 class='violet-color'>Retweet via "+ tweetAuthor +" on "+ dateDisplay +"</h5>"+ mainTweet.tweetText +"<br>via <a href='" + mainTweet.author.profileUrl + "'>" + mainTweet.author.username + "</a> | " + mainTweet.date_display + " | " + "<a href='" + mainTweet.tweetUrl + "'>View</a>"+ " | <a class='retweet'  href='/tweet/" + tweetId + "/retweet/'>Retweet</a> | <a href='#' class='tweet-like' data-id="+ tweetId +">"+ verb + " ("+ tweetValue.likes +")</a></div></div><hr>";
+              }else{
+                  tweetFormattedHTML = formatTweet(tweetValue)
+              }
+-->
