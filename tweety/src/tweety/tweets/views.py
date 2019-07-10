@@ -70,7 +70,7 @@ class TweetDetailView(DetailView):
         #print(context)
         return context
 
-class TweetListView(ListView):
+class TweetListView(LoginRequiredMixin, ListView):
     template_name = 'tweets/listView.html'
     
     def get_queryset(self, *args, **kwargs):

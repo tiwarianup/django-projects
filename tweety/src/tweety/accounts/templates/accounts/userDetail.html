@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load recommended %}
 {% block script %}
 <script>
 
@@ -38,6 +39,9 @@ $(document).ready(function(){
         {% empty %}
             <h5>Not following any users currently.</h5>
         {% endfor %}
+        <hr>
+        <h3>Recommended </h3>
+        {% recommended request.user %}
         
     </div>
     <div class="col-sm-9 col-xs-12">
